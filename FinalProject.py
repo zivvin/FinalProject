@@ -2,7 +2,7 @@
 Name: Zachary Chin
 CS230: Section SN4
 Data: Boston Uber and Lyft Rideshare Data Sample
-URL:
+URL: https://share.streamlit.io/zivvin/finalproject/main/FinalProject.py
 
 Description: This program takes data from the sample of Uber and Lyft rides and analyzes it in various ways. It will create
              GridLayer map that tells how many rides are taken from somewhere. It will also create two bar graphs based
