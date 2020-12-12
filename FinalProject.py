@@ -29,7 +29,6 @@ sourceDict = {"Beacon Hill": [42.3588, -71.0707], "Theatre District": [42.3519, 
 rideshare = pd.read_csv(FILENAME, usecols=COLUMNS)
 
 st.title("CS230 Final Project")
-st.write(rideshare["source"])
 
 def addLatitude(row):
     # Adds a latitude column to the dataset based on the source of the ride
@@ -83,14 +82,8 @@ def createMap():
     mapData["lon"] = mapData.apply(addLongitude, axis=1)
 
     # Creates the map as a GridLayer map
-    tool_tip = {"html": "Location: <b>{point}</b> <br/> Count: <b>{count}</b>", "style": {"color": "white"}}
-    layer1 = pdk.Layer('ScatterplotLayer',
-                  data=mapData,
-                  get_position='[lon, lat]',
-                  get_radius=150,
-                  get_color=[0,0,255],
-                  pickable=True,
-                  )
+    tool_tip = {"html": "Location: <b>{source}</b> Count: <b>{count}</b>", "color": "white"}
+
     layer = pdk.Layer("GridLayer", mapData, pickable=True, extruded=True, cell_size=300, elevation_scale=5, get_position=["lon", "lat"])
     view_state = pdk.ViewState(latitude=mapData["lat"].mean(), longitude=mapData["lon"].mean(), zoom=11, pitch=45, bearing=30)
     timeMap = pdk.Deck(layers=[layer], initial_view_state=view_state, mapbox_key=MAPKEY, tooltip=tool_tip)
