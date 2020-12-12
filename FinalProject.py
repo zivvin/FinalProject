@@ -85,7 +85,7 @@ def createMap():
     tool_tip = {"html": "Location: <b> {index} </b> <br/> Count: <b>{count}</b>", "style": {"color": "white"}}
 
     layer = pdk.Layer("GridLayer", mapData, pickable=True, extruded=True, cell_size=300, elevation_scale=4, get_position=["lon", "lat"])
-    view_state = pdk.ViewState(latitude=mapData["lat"].mean(), longitude=mapData["lon"].mean(), zoom=11, pitch=45, bearing=30)
+    view_state = pdk.ViewState(latitude=mapData["lat"].mean(), longitude=mapData["lon"].mean(), zoom=12, pitch=45, bearing=30)
     rideMap = pdk.Deck(layers=[layer], initial_view_state=view_state, mapbox_key=MAPKEY, tooltip=tool_tip)
 
     col1.pydeck_chart(rideMap)
@@ -130,6 +130,8 @@ def chooseNumeric():
                 return key
 
     chosenData["option"] = chosenData.apply(func=addBins, axis=1)
+
+    # adds the data type to the end of the bar graph labels
     if (choice == "temperature") or (choice == "apparentTemperature"):
         chosenData["option"] += "°F"
     elif choice == "price":
