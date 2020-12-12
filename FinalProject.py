@@ -60,7 +60,7 @@ def createMap():
     col1.subheader("Map of where people are taking rides from")
     col2.write("Choose which locations to show")
 
-    # creates the list of source locations that will be included in the map
+    # creates the list of source locations that will be included in the map based on user selection
     chosenList = []
     for area in sourceDict.keys():
         area_Status = col2.checkbox(area, value=True)
@@ -82,14 +82,23 @@ def createMap():
     mapData["lon"] = mapData.apply(addLongitude, axis=1)
 
     # Creates the map as a GridLayer map
-    tool_tip = {"html": "Location: <b>{source}</b> Count: <b>{count}</b>", "color": "white"}
+    tool_tip = {"html": "Location: <b> {index} </b> <br/> Count: <b>{count}</b>", "style": {"color": "white"}}
 
-    layer = pdk.Layer("GridLayer", mapData, pickable=True, extruded=True, cell_size=300, elevation_scale=5, get_position=["lon", "lat"])
+    layer = pdk.Layer("GridLayer", mapData, pickable=True, extruded=True, cell_size=300, elevation_scale=4, get_position=["lon", "lat"])
     view_state = pdk.ViewState(latitude=mapData["lat"].mean(), longitude=mapData["lon"].mean(), zoom=11, pitch=45, bearing=30)
-    timeMap = pdk.Deck(layers=[layer], initial_view_state=view_state, mapbox_key=MAPKEY, tooltip=tool_tip)
+    rideMap = pdk.Deck(layers=[layer], initial_view_state=view_state, mapbox_key=MAPKEY, tooltip=tool_tip)
 
-    col1.pydeck_chart(timeMap)
+    col1.pydeck_chart(rideMap)
 
+    col1.write("Location Key:")
+    legendString = ""
+    indexValue = 0
+    for area in chosenList:
+        string = str(indexValue) + ": " + area + " "
+        indexValue += 1
+        legendString += string
+
+    col1.write(legendString)
 
 def chooseNumeric():
     # Has the user choose data to be used in a bar graph
@@ -108,8 +117,12 @@ def chooseNumeric():
     binSize = bin(chosenData["numbers"].max(), chosenData["numbers"].min())
     binDict = {}
     for n in range(5):
-        binDict[f"{chosenData['numbers'].min() + binSize * n:.2f}" + " to " + f"{chosenData['numbers'].min() + binSize * (1 + n):.2f}"] \
-            = [chosenData["numbers"].min() + binSize * n, chosenData["numbers"].min() + binSize * (1 + n)]
+        if n < 4:
+            binDict[f"{chosenData['numbers'].min() + binSize * n:.2f}" + " to " + f"{chosenData['numbers'].min() + binSize * (1 + n):.2f}"] \
+                = [chosenData["numbers"].min() + binSize * n, chosenData["numbers"].min() + binSize * (1 + n)]
+        else:
+            binDict[f"{chosenData['numbers'].min() + binSize * n:.2f}" + " to " + f"{chosenData['numbers'].max():.2f}"] = [chosenData["numbers"].min() + binSize * n, chosenData["numbers"].max()]
+
 
     def addBins(row):
         for key in binDict.keys():
@@ -117,6 +130,12 @@ def chooseNumeric():
                 return key
 
     chosenData["option"] = chosenData.apply(func=addBins, axis=1)
+    if (choice == "temperature") or (choice == "apparentTemperature"):
+        chosenData["option"] += "°F"
+    elif choice == "price":
+        chosenData["option"] += " Dollars"
+    else:
+        chosenData["option"] += " Miles"
 
     # puts the chosen data into the bar graph creating function
     createBar(chosenData)
