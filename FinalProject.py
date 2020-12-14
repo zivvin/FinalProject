@@ -20,7 +20,7 @@ MAPKEY = "pk.eyJ1IjoiemNoaW4iLCJhIjoiY2tpaTZ1bnV5MDBtazJ0cjM2aWYxeWx0ciJ9.gJsBdy
 FILENAME = "ridesharesample.csv"
 COLUMNS = ["day", "month", "datetime", "source", "destination", "cab_type", "price", "distance",
            "latitude", "longitude", "temperature", "apparentTemperature", "short_summary", "long_summary"]
-sourceDict = {"Beacon Hill": [42.3588, -71.0707], "Theatre District": [42.3519, -71.0643], "Financial District": [42.3559, -71.0550],
+SOURCEDICT = {"Beacon Hill": [42.3588, -71.0707], "Theatre District": [42.3519, -71.0643], "Financial District": [42.3559, -71.0550],
               "Back Bay": [42.3503, -71.0810], "Northeastern University": [42.3398, -71.0892], "Boston University": [42.3505, -71.1054],
               "Fenway": [42.3467, -71.0972], "West End": [42.3644, -71.0661], "Haymarket Square": [42.3638, -71.0585], "North End": [42.3647, -71.0542],
               "South Station": [42.3519, -71.0552], "North Station": [42.3663, -71.0622]}
@@ -32,13 +32,13 @@ st.title("CS230 Final Project")
 
 def addLatitude(row):
     # Adds a latitude column to the dataset based on the source of the ride
-    lat = sourceDict[row["source"]][0]
+    lat = SOURCEDICT[row["source"]][0]
     return lat
 
 
 def addLongitude(row):
     # Adds a longitude column to the dataset based on the source of the ride
-    lon = sourceDict[row["source"]][1]
+    lon = SOURCEDICT[row["source"]][1]
     return lon
 
 
@@ -62,7 +62,7 @@ def createMap():
 
     # creates the list of source locations that will be included in the map based on user selection
     chosenList = []
-    for area in sourceDict.keys():
+    for area in SOURCEDICT.keys():
         area_Status = col2.checkbox(area, value=True)
         if area_Status:
             chosenList.append(area)
@@ -90,6 +90,7 @@ def createMap():
 
     col1.pydeck_chart(rideMap)
 
+    # Writes the key for the map with the respective index value
     col1.write("Location Key:")
     legendString = ""
     indexValue = 0
@@ -163,11 +164,11 @@ def createBar(df):
     # creates a pivot table based on the data the user chose and
     table = pd.pivot_table(data=df, index=["option"], columns=["cab_type"], values=["rides"], aggfunc=np.sum, fill_value=0)
     # plots the pivot table with a legend, and the amount of rides (in a christmas theme)
-    table.plot(kind="bar", color=["red", "green"], edgecolor="white")
+    table.plot(kind="barh", color=["red", "green"], edgecolor="white")
     plt.legend(labels=["Lyft", "Uber"])
-    plt.xlabel("")
-    plt.ylabel("Rides")
-    plt.xticks(rotation=30, ha="right")
+    plt.ylabel("")
+    plt.xlabel("Rides")
+    # Makes the background of the plot black
     ax = plt.gca()
     ax.set_facecolor("black")
     st.pyplot(plt)
